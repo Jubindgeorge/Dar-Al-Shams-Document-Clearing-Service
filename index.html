@@ -21,7 +21,7 @@
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
-        body { background: #0f172a; color: var(--text-main); min-height: 100vh; display: flex; overflow-x: hidden; }
+        body { background: #0f172a; color: var(--text-main); min-height: 100vh; display: flex; overflow-x: hidden; position: relative; }
 
         /* Login Screen Layout */
         #auth-container {
@@ -42,16 +42,29 @@
         #app-container { display: none; width: 100%; min-height: 100vh; flex-direction: row; }
         
         /* Navigation Sidebar */
-        .sidebar { width: 260px; background: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); text-align: center; }
+        .sidebar { 
+            width: 260px; 
+            background: var(--panel-bg); 
+            border-right: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            flex-shrink: 0; 
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+        .sidebar.collapsed {
+            width: 0;
+            border-right: none;
+        }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); text-align: center; white-space: nowrap; }
         .sidebar-header h3 { color: var(--primary); font-size: 1.2rem; letter-spacing: 1px; }
-        .sidebar-menu { list-style: none; padding: 20px 0; flex: 1; }
+        .sidebar-menu { list-style: none; padding: 20px 0; flex: 1; min-width: 260px; }
         .sidebar-menu li {
             padding: 14px 25px; color: var(--text-muted); cursor: pointer;
             display: flex; align-items: center; gap: 12px; font-weight: 500; transition: all 0.2s;
         }
         .sidebar-menu li:hover, .sidebar-menu li.active { background: rgba(203, 163, 88, 0.1); color: var(--primary); }
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); min-width: 260px; }
 
         /* Content Context Windows */
         .content-area { flex: 1; display: flex; flex-direction: column; background: #0f172a; min-width: 0; }
@@ -69,6 +82,27 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             flex-wrap: wrap;
             gap: 15px;
+        }
+        .top-bar-title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .sidebar-toggle-btn {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .sidebar-toggle-btn:hover {
+            background: rgba(203, 163, 88, 0.1);
         }
         .user-profile-badge {
             background: #0f172a;
@@ -127,16 +161,118 @@
         .service-item-row span { color: var(--text-muted); flex-shrink: 0; }
         .service-card-total { margin-top: 12px; font-weight: bold; text-align: right; color: var(--accent-blue); border-top: 1px solid var(--border-color); padding-top: 8px; }
 
-        /* Workspace Splits for Document Creation Studio */
-        .studio-container { display: flex; gap: 30px; min-height: calc(100vh - 160px); }
-        .studio-editor { width: 420px; background: var(--panel-bg); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); height: fit-content; }
-        .studio-preview { flex: 1; background: #334155; padding: 30px; border-radius: 8px; display: flex; justify-content: center; overflow-x: auto; align-items: flex-start; }
+        /* Horizontal Form Row Layout for Studio */
+        .studio-horizontal-meta {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        /* Spreadsheet-style Dynamic Canvas Layout */
+        .studio-table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            background: rgba(15, 23, 42, 0.4);
+        }
+        .studio-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .studio-table th {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--primary);
+            padding: 12px 15px;
+            font-size: 0.85rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .studio-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            vertical-align: middle;
+        }
+        .studio-table tr:last-child td { border-bottom: none; }
+        .studio-table input {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .studio-table input:focus { border-color: var(--primary); }
+
+        /* Full Page Popup Overlay Modal Design for Invoice Preview */
+        .preview-modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px);
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center; z-index: 10001;
+            padding: 20px; overflow: hidden;
+        }
+        .preview-modal-toolbar {
+            width: 100%; max-width: 850px; background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 12px 12px 0 0; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2); gap: 15px; flex-shrink: 0;
+        }
+        .preview-modal-body-canvas {
+            width: 100%; max-width: 850px; background: #334155; border-radius: 0 0 12px 12px;
+            display: flex; justify-content: center; align-items: flex-start; overflow: hidden;
+            box-shadow: var(--modal-shadow); flex: 1; min-height: 0; padding: 20px; position: relative;
+        }
         
-        /* Dynamic Paper Interface */
+        /* Dynamic Scalable Paper Container Layout */
+       /* Dynamic Scalable Paper Container Layout */
+.a4-wrapper {
+    width: 800px;
+    height: 1131px; /* Natural aspect ratio of standard A4 */
+    transform-origin: top left; /* Changed from top center to top left */
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background: white;
+}
+
         .a4-page {
-            width: 100%; max-width: 800px; min-width: 650px; min-height: fit-content; padding: 40px; background: white; 
-            color: #000; box-shadow: 0 10px 25px rgb(0 0 0 / 0.3); display: flex; flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 20px; 
+            background: white; 
+            color: #000; 
+            box-shadow: 0 10px 25px rgb(0 0 0 / 0.3); 
+            display: flex; 
+            flex-direction: column;
             position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Premium Gold Frame Style */
+        .premium-gold-frame {
+            border: 5px solid transparent;
+            border-image: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c) 30;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .a4-internal-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box;
         }
 
         /* Premium Hardcopy Header Interface */
@@ -205,7 +341,7 @@
             border: 1px solid #cbd5e1 !important; 
             padding: 10px !important; 
             color: #000 !important; 
-            font-size: 0.95rem !important; 
+            font-size: 1rem !important; 
             vertical-align: middle !important;
             word-wrap: break-word;
         }
@@ -224,8 +360,18 @@
         }
         /* Studio UI Footer Positioning */
         .a4-footer { margin-top: auto; display: flex; justify-content: space-between; padding-top: 15px; gap: 20px; }
-        .a4-sign-box { width: 220px; text-align: center; border-top: 1px solid #94a3b8; padding-top: 5px; font-size: 0.99rem; font-weight: bold; display: flex; flex-direction: column; align-items: center; }
-        .a4-signature-img { height: 50px; max-width: 180px; object-fit: contain; margin-bottom: 2px; }
+        .a4-sign-box { width: 220px; text-align: center; border-top: none; padding-top: 5px; font-size: 0.99rem; font-weight: bold; display: flex; flex-direction: column; align-items: center; }
+        .a4-signature-img {
+    height: 65px; /* Slightly increased height to make it more prominent */
+    object-fit: contain;
+    margin-bottom: 5px;
+    
+    /* Enhances contrast and darkens the lines */
+    filter: contrast(1.5) brightness(0.9); 
+    
+    /* Blends the white image background perfectly with the invoice paper */
+    mix-blend-mode: multiply; 
+}
 
         .flex-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
@@ -260,38 +406,27 @@
             opacity: 0.8 !important; 
             pointer-events: none !important; 
         }
-
         .watermark-logo img { width: 100% !important; height: auto !important; }
 
         /* Ensure the main content stays above the watermark */
         .a4-header, .a4-title, .a4-meta, .a4-table, .a4-footer { position: relative !important; z-index: 1 !important; }
 
-        /* Premium Gold Frame Style */
-        .premium-gold-frame {
-            border: 15px solid transparent;
-            border-image: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c) 30;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.1);
-            background: #ffffff;
-            padding: 20px;
-            margin: 5px auto;
-        }
-
         /* Responsive Layout Overrides for Gadget Screens */
         @media screen and (max-width: 1024px) {
-            .studio-container { flex-direction: column; }
-            .studio-editor { width: 100%; }
-            .studio-preview { padding: 20px 10px; }
+            .studio-horizontal-meta { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media screen and (max-width: 768px) {
             #app-container { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .sidebar { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .sidebar.collapsed { display: none; }
             .sidebar-menu { display: flex; flex-wrap: wrap; padding: 10px; justify-content: center; }
             .sidebar-menu li { padding: 10px 15px; font-size: 0.9rem; }
             .sidebar-header { padding: 15px; }
             .sidebar-footer { display: none; }
             .top-bar { padding: 15px 20px; justify-content: center; text-align: center; }
             .view-space { padding: 20px 15px; }
+            .studio-horizontal-meta { grid-template-columns: 1fr; }
             
             div[style*="grid-template-columns: repeat(3, 1fr)"] {
                 grid-template-columns: 1fr !important;
@@ -301,19 +436,20 @@
 
         /* Print Override Rules */
         @media print {
-            @page { size: A4 portrait; margin: 5mm; }
+            @page { size: A4 portrait; margin: 0; }
+            html, body { background: #fff !important; color: #000 !important; width: 210mm; height: 297mm; overflow: visible !important; }
             body * { visibility: hidden; }
-            #view-studio, .a4-page, .a4-page * { visibility: visible; }
-            .a4-page {
-                position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; min-width: 100% !important;
-                min-height: 277mm !important; display: flex !important; flex-direction: column !important; background: white !important; padding: 0 !important; box-shadow: none !important; border: none !important;
-            }
-            .a4-table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; margin-bottom: auto !important; }
-            .a4-table th, .a4-table td { border: 1px solid #000 !important; padding: 10px !important; text-align: left !important; }
-            .a4-footer { margin-top: auto !important; display: flex !important; justify-content: space-between !important; padding-top: 10px !important; border-top: none !important; }
-            .a4-sign-box { border-top: none !important; padding-top: 15px !important; }
-            .studio-editor, .sidebar, .top-bar, .no-print, .btn { display: none !important; }
-            .premium-gold-frame { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; border: 5px double #bf953f !important; background: #ffffff !important; border-image: none !important; box-shadow: none !important; margin: 0 !important; padding: 20px !important; width: 100% !important; }
+            #document-preview-modal, .a4-wrapper, .a4-page, .premium-gold-frame, .a4-internal-content, .a4-internal-content * { visibility: visible !important; }
+            #document-preview-modal { position: absolute !important; left: 0 !important; top: 0 !important; background: transparent !important; padding: 0 !important; width: 100% !important; height: 100% !important; overflow: visible !important; display: block !important; }
+            .preview-modal-body-canvas { background: transparent !important; padding: 0 !important; box-shadow: none !important; width: 100% !important; height: 100% !important; overflow: visible !important; display: block !important; }
+            .a4-wrapper { transform: scale(1) !important; width: 210mm !important; height: 297mm !important; max-width: 100% !important; max-height: 100% !important; margin: 0 !important; padding: 0 !important; position: absolute !important; left: 0 !important; top: 0 !important; box-shadow: none !important; }
+            .a4-page { width: 100% !important; height: 100% !important; background: white !important; padding: 20px !important; box-shadow: none !important; border: none !important; box-sizing: border-box !important; }
+            .premium-gold-frame { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; border: 5px solid transparent !important; border-image: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c) 30 !important; width: 100% !important; height: 100% !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+            .a4-internal-content { padding: 20px !important; height: 100% !important; width: 100% !important; box-sizing: border-box !important; }
+            .a4-table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
+            .a4-table th, .a4-table td { border: 1px solid #cbd5e1 !important; padding: 10px !important; }
+            .a4-footer { margin-top: auto !important; display: flex !important; justify-content: space-between !important; }
+            .preview-modal-toolbar, .sidebar, .top-bar, .no-print, .btn { display: none !important; }
         }
     </style>
 </head>
@@ -371,6 +507,76 @@
     </div>
 </div>
 
+<!-- Full Screen Invoice Preview Overlay Modal Popup Window -->
+<div id="document-preview-modal" class="preview-modal-backdrop" style="display:none;">
+    <div class="preview-modal-toolbar">
+        <div>
+            <h3 id="preview-modal-heading" style="color:var(--primary); font-size:1.15rem;">Document Studio Archive Verification</h3>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:2px;">Autosaved to Firebase Storage Cloud</p>
+        </div>
+        <div class="flex-actions">
+            <button class="btn btn-success" onclick="window.print()">⚡ Print Hardcopy</button>
+            <button class="btn btn-secondary" onclick="closePreviewModal()">Close Preview</button>
+        </div>
+    </div>
+    <div class="preview-modal-body-canvas">
+        <div class="a4-wrapper" id="a4-wrapper-element">
+            <div class="a4-page">
+                <div class="premium-gold-frame">
+                    <div class="a4-internal-content">
+                        <div class="watermark" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.2; z-index: 0; pointer-events: none;">
+                            <img src="LOGO WHITE .png" alt="Watermark" style="width: 400px;">
+                        </div>
+                        <div class="a4-header">
+                            <div class="a4-logo-box">
+                                <img src="LOGO WHITE .png" alt="Dar Al Shams Logo" onerror="this.outerHTML='<div style=\'color: #cba358; font-weight: 800; font-size: 1.4rem;\'>DAR AL SHAMS</div>'">
+                            </div>
+                            <div class="a4-co-details">
+                                <h1>دار الشمس لخدمات تخليص المعاملات</h1>
+                                <div class="en-title">DAR AL SHAMS DOCUMENTS CLEARING SERVICES</div>
+                                <div class="sub-info">Tel: +971 4 236 7006 | Office # 227, Dubai, UAE</div>
+                                <div class="sub-info">Email: info@daralshams.ae</div>
+                            </div>
+                        </div>
+                        <div class="a4-title" id="p-doc-title">INVOICE / فاتورة</div>
+                        <div class="a4-meta">
+                            <div class="a4-meta-column client-box">
+                                <div id="p-client-name" class="client-line-en">M/s: </div>
+                                <div id="p-client-name-ar" class="client-line-ar">السيد / </div>
+                            </div>
+                            <div class="a4-meta-column meta-box">
+                                <div id="p-doc-ref" style="font-size:1.05rem; font-weight: bold; color:#1e293b;">No: </div>
+                                <div id="p-doc-date">Date: </div>
+                            </div>
+                        </div>
+                        <table class="a4-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%;">S.No</th>
+                                    <th style="width: 60%;">Description / التفاصيل</th>
+                                    <th style="width: 12%;">Qty</th>
+                                    <th style="width: 18%;">Amount (Dhs) / المبلغ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="p-table-body"></tbody>
+                        </table>
+                        <div class="a4-footer">
+                            <div class="a4-sign-box" style="justify-content: flex-end;">
+                                <div style="height: 50px;"></div>
+                                <span>Receiver's Sign / توقيع المستلم</span>
+                            </div>
+                            <div class="a4-sign-box">
+                                <img src="SIGN.jpeg.png" class="a4-signature-img" alt="Authorized Signature" onerror="this.style.display='none'">
+                                <span>Authorized Signature / التوقيع</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Authentication Overlay Module -->
 <div id="auth-container">
     <div class="login-card">
@@ -389,7 +595,7 @@
 </div>
 
 <div id="app-container">
-    <div class="sidebar">
+    <div class="sidebar" id="app-sidebar">
         <div class="sidebar-header">
             <h3>DAR AL SHAMS</h3>
         </div>
@@ -408,7 +614,10 @@
 
     <div class="content-area">
         <div class="top-bar">
-            <h2 id="page-title" style="color: var(--primary); font-weight: 700; letter-spacing: 0.5px;">System Overview</h2>
+            <div class="top-bar-title-section">
+                <button class="sidebar-toggle-btn" onclick="toggleSidebar()">☰</button>
+                <h2 id="page-title" style="color: var(--primary); font-weight: 700; letter-spacing: 0.5px;">System Overview</h2>
+            </div>
             <div class="user-profile-badge">Portal Session: <strong>Administrator</strong></div>
         </div>
         
@@ -474,101 +683,78 @@
                 </div>
             </div>
 
+            <!-- Studio Window Containing the Horizontal Configurations Console and Inline Spreadsheet Canvas -->
             <div id="view-studio" class="view-panel">
-                <div class="studio-container">
-                    <div class="studio-editor">
-                        <h3 id="studio-mode-title" style="color:var(--primary); margin-bottom:20px;">Document Parameters</h3>
-                        <div class="form-group" style="background: rgba(203, 163, 88, 0.1); padding: 12px; border-radius: 6px; border: 1px dashed var(--primary); margin-bottom: 20px;">
-                            <label style="color: var(--primary); font-weight: bold; margin-bottom: 6px;">⚡ Quick Service Injector Tool</label>
-                            <select id="st-service-injector" onchange="injectServicePresetToItems()">
-                                <option value="">-- Choose Package to Auto-Populate items --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Auto-Generated Reference ID</label>
-                            <input type="text" id="st-ref-code" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>Target Account Profile (Editable)</label>
-                            <input type="text" id="st-client" list="registered-clients-list" placeholder="Type name or select..." oninput="syncStudioPreview()">
-                            <datalist id="registered-clients-list"></datalist>
-                        </div>
-                        <div class="form-group">
-                            <label>Issue Date</label>
-                            <input type="date" id="st-date" oninput="calculateAutoReference(); syncStudioPreview()">
-                        </div>
-                        <hr style="border-color:var(--border-color); margin: 20px 0;">
-                        <h4 style="margin-bottom:10px;">Line Items Table</h4>
-                        <div id="st-items-container"></div>
-                        <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="addStudioRow()">+ Append Row Manually</button>
-                        <button class="btn btn-primary" style="width:100%; margin-top:20px; padding:12px;" onclick="commitDocumentToMemory()">Commit Document Record</button>
+                <h3 id="studio-mode-title" style="color:var(--primary); margin-bottom:20px;">Document Parameters</h3>
+                
+                <!-- Horizontal Management Controls Row Bar -->
+                <div class="studio-horizontal-meta">
+                    <div class="form-group" style="margin-bottom:0; background: rgba(203, 163, 88, 0.1); padding: 10px; border-radius: 6px; border: 1px dashed var(--primary); display: flex; flex-direction: column; justify-content: center;">
+                        <label style="color: var(--primary); font-weight: bold; margin-bottom: 4px;">⚡ Service Injector</label>
+                        <select id="st-service-injector" onchange="injectServicePresetToItems()">
+                            <option value="">-- Choose Preset Catalog --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Auto-Generated Reference ID</label>
+                        <input type="text" id="st-ref-code" disabled>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Target Account Profile</label>
+                        <input type="text" id="st-client" list="registered-clients-list" placeholder="Type name or select...">
+                        <datalist id="registered-clients-list"></datalist>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Issue Date</label>
+                        <input type="date" id="st-date" oninput="calculateAutoReference()">
+                    </div>
+                </div>
+
+                <div style="background: var(--panel-bg); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap: 10px;">
+                        <h4>Line Items Canvas</h4>
+                        <button class="btn btn-secondary" onclick="addStudioRow(true)">+ Append Row Manually</button>
                     </div>
                     
-                    <div class="studio-preview">
-                        <div class="a4-page premium-gold-frame" style="position: relative; overflow: hidden;">
-                            <div class="watermark" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.2; z-index: 0; pointer-events: none;">
-                                <img src="LOGO WHITE .png" alt="Watermark" style="width: 400px;">
-                            </div>
-                            <div style="position: relative; z-index: 1;">
-                                <div class="a4-header">
-                                    <div class="a4-logo-box">
-                                        <img src="LOGO WHITE .png" alt="Dar Al Shams Logo" onerror="this.outerHTML='<div style=\'color: #cba358; font-weight: 800; font-size: 1.4rem;\'>DAR AL SHAMS</div>'">
-                                    </div>
-                                    <div class="a4-co-details">
-                                        <h1>دار الشمس لخدمات تخليص المعاملات</h1>
-                                        <div class="en-title">DAR AL SHAMS DOCUMENTS CLEARING SERVICES</div>
-                                        <div class="sub-info">Tel: +971 4 236 7006 | Office # 227, Dubai, UAE</div>
-                                        <div class="sub-info">Email: info@daralshams.ae</div>
-                                    </div>
-                                </div>
-                                <div class="a4-title" id="p-doc-title">INVOICE / فاتورة</div>
-                                <div class="a4-meta">
-                                    <div class="a4-meta-column client-box">
-                                        <div id="p-client-name" class="client-line-en">M/s: </div>
-                                        <div id="p-client-name-ar" class="client-line-ar">السيد / </div>
-                                    </div>
-                                    <div class="a4-meta-column meta-box">
-                                        <div id="p-doc-ref" style="font-size:1.05rem; font-weight: bold; color:#1e293b;">No: </div>
-                                        <div id="p-doc-date">Date: </div>
-                                    </div>
-                                </div>
-                                <table class="a4-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 10%;">S.No</th>
-                                            <th style="width: 60%;">Description / التفاصيل</th>
-                                            <th style="width: 12%;">Qty</th>
-                                            <th style="width: 18%;">Amount (Dhs) / المبلغ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="p-table-body"></tbody>
-                                </table>
-                                <div class="a4-footer">
-                                    <div class="a4-sign-box" style="justify-content: flex-end;">
-                                        <div style="height: 50px;"></div>
-                                        <span>Receiver's Sign / توقيع المستلم</span>
-                                    </div>
-                                    <div class="a4-sign-box">
-                                        <img src="SIGN.webp" class="a4-signature-img" alt="Authorized Signature" onerror="this.style.display='none'">
-                                        <span>Authorized Signature / التوقيع</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- High-Speed Inline SpreadSheet Canvas Layout -->
+                    <div class="studio-table-container">
+                        <table class="studio-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%; text-align: center;">#</th>
+                                    <th style="width: 55%;">Item Description / Details</th>
+                                    <th style="width: 12%;">Qty</th>
+                                    <th style="width: 18%;">Unit Price (Dhs)</th>
+                                    <th style="width: 10%; text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="st-spreadsheet-body"></tbody>
+                        </table>
                     </div>
+                    
+                    <button class="btn btn-primary" style="width:100%; padding:14px; font-size:1rem; margin-top:10px;" onclick="commitDocumentToMemory()">Commit Document Record & View Preview</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modern Firebase v12 Implementation Module Script -->
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('app-sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('collapsed');
+        }
+    }
+    window.toggleSidebar = toggleSidebar;
+</script>
+
+<!-- Modern Firebase Implementation Module Script -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
     import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
-    // Your confirmed web app's Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCuejMSsX0dnJ09ajwADYrT7-Ow4VWLqGo",
         authDomain: "dar-al-shams.firebaseapp.com",
@@ -580,7 +766,6 @@
         measurementId: "G-WXEGFW21E7"
     };
 
-    // Initialize Firebase Services
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
@@ -608,8 +793,43 @@
         activeEditingId: null 
     };
 
+    // Responsive Canvas Resizer - Formulated to cleanly center the canvas layout perfectly
+    function resizePreviewCanvas() {
+        const wrapper = document.getElementById('a4-wrapper-element');
+        const container = document.querySelector('.preview-modal-body-canvas');
+        if (!wrapper || !container) return;
+
+        if (window.matchMedia('print').matches) {
+            wrapper.style.transform = 'none';
+            wrapper.style.margin = '0';
+            return;
+        }
+
+        const availableWidth = container.clientWidth - 40;
+        const availableHeight = container.clientHeight - 40;
+
+        const baseWidth = 800;
+        const baseHeight = 1131;
+
+        // Determine matching scalar factors to fully fit both constraints evenly
+        const scaleX = availableWidth / baseWidth;
+        const scaleY = availableHeight / baseHeight;
+        const optimalScaleFactor = Math.min(scaleX, scaleY);
+
+        wrapper.style.transform = `scale(${optimalScaleFactor})`;
+        
+        // Dynamically calculate centering offsets for both dimensions
+        const offsetLeft = (container.clientWidth - (baseWidth * optimalScaleFactor)) / 2;
+        const offsetTop = (container.clientHeight - (baseHeight * optimalScaleFactor)) / 2;
+        
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = `${offsetLeft}px`;
+        wrapper.style.top = `${offsetTop}px`;
+    }
+
+    window.addEventListener('resize', resizePreviewCanvas);
+
     function initFirebaseListeners() {
-        // 1. Clients Sync Route
         onValue(ref(db, 'clients'), (snapshot) => {
             const data = snapshot.val();
             state.clients = data ? Object.values(data) : [];
@@ -617,14 +837,12 @@
             renderDashboardStats();
         });
 
-        // 2. Services Catalog Sync Route
         onValue(ref(db, 'services'), (snapshot) => {
             const data = snapshot.val();
             state.services = data ? Object.values(data) : getMockServicesFallback();
             renderServicesCatalog();
         });
 
-        // 3. Documents Sync Route
         onValue(ref(db, 'documents'), (snapshot) => {
             const data = snapshot.val();
             state.documents = data ? Object.values(data) : [];
@@ -956,7 +1174,7 @@
     function populateStudioPresetDropdown() {
         const select = document.getElementById('st-service-injector');
         if(!select) return;
-        select.innerHTML = '<option value="">-- Choose Package to Auto-Populate items --</option>' + 
+        select.innerHTML = '<option value="">-- Choose Preset Catalog --</option>' + 
             state.services.map(s => `<option value="${s.id}">${s.title}</option>`).join('');
     }
 
@@ -973,7 +1191,6 @@
             function() {
                 state.currentStudioItems = targetPkg.items.map(item => ({ d: item.d, q: 1, p: item.p }));
                 renderStudioInputs();
-                syncStudioPreview();
             }
         );
         select.value = ""; 
@@ -1024,7 +1241,6 @@
         
         calculateAutoReference();
         renderStudioInputs();
-        syncStudioPreview();
     }
 
     function toggleSelectAllDocuments(master) {
@@ -1082,13 +1298,11 @@
         
         calculateAutoReference();
         renderStudioInputs();
-        syncStudioPreview();
     }
 
     function addStudioRow(shouldFocus = false) {
         state.currentStudioItems.push({ d: '', q: 1, p: 0 });
         renderStudioInputs();
-        syncStudioPreview();
         if (shouldFocus) {
             const nextIdx = state.currentStudioItems.length - 1;
             const nextInput = document.getElementById(`desc-input-${nextIdx}`);
@@ -1097,7 +1311,12 @@
     }
 
     function handlePriceKeydown(event, currentIndex) {
-        if (event.key === 'Enter') {
+        if (event.key === 'Tab' && !event.shiftKey) {
+            if (currentIndex === state.currentStudioItems.length - 1) {
+                event.preventDefault();
+                addStudioRow(true);
+            }
+        } else if (event.key === 'Enter') {
             event.preventDefault();
             addStudioRow(true);
         }
@@ -1107,42 +1326,46 @@
         state.currentStudioItems.splice(i, 1);
         if(state.currentStudioItems.length === 0) state.currentStudioItems.push({ d: '', q: 1, p: 0 });
         renderStudioInputs();
-        syncStudioPreview();
     }
 
     function renderStudioInputs() {
-        const container = document.getElementById('st-items-container');
-        container.innerHTML = state.currentStudioItems.map((item, i) => `
-            <div style="margin-bottom:15px; background:rgba(0,0,0,0.15); padding:10px; border-radius:6px; border:1px solid var(--border-color)">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <label style="font-size:0.75rem;">Line #${i+1}</label>
-                    <span style="color:#ef4444; cursor:pointer; font-size:0.8rem;" id="remove-btn-${i}">Delete</span>
-                </div>
-                <input style="margin-bottom:5px;" type="text" id="desc-input-${i}" value="${item.d}" placeholder="Item Description">
-                <div style="display:flex; gap:5px;">
-                    <input type="number" id="qty-input-${i}" value="${item.q}" placeholder="Qty">
-                    <input type="number" id="price-input-${i}" value="${item.p}" placeholder="Unit Price">
-                </div>
-            </div>
+        const tbody = document.getElementById('st-spreadsheet-body');
+        if(!tbody) return;
+
+        tbody.innerHTML = state.currentStudioItems.map((item, i) => `
+            <tr>
+                <td style="text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">${i+1}</td>
+                <td>
+                    <input type="text" id="desc-input-${i}" value="${item.d}" placeholder="Item Description / Payment Details..." style="width: 100%;">
+                </td>
+                <td>
+                    <input type="number" id="qty-input-${i}" value="${item.q}" placeholder="1" style="width: 100%; text-align: center;">
+                </td>
+                <td>
+                    <input type="number" id="price-input-${i}" value="${item.p}" placeholder="0.00" style="width: 100%; text-align: right;">
+                </td>
+                <td style="text-align: center;">
+                    <button class="btn btn-danger" id="remove-btn-${i}" style="padding: 6px 12px; font-size: 0.8rem;">✕</button>
+                </td>
+            </tr>
         `).join('');
 
-        // Re-attach interactive state listeners directly within the module scope
         state.currentStudioItems.forEach((item, i) => {
             document.getElementById(`remove-btn-${i}`).onclick = () => removeStudioRow(i);
             
             const descInp = document.getElementById(`desc-input-${i}`);
-            descInp.oninput = () => { state.currentStudioItems[i].d = descInp.value; syncStudioPreview(); };
+            descInp.oninput = () => { state.currentStudioItems[i].d = descInp.value; };
 
             const qtyInp = document.getElementById(`qty-input-${i}`);
-            qtyInp.oninput = () => { state.currentStudioItems[i].q = parseFloat(qtyInp.value) || 0; syncStudioPreview(); };
+            qtyInp.oninput = () => { state.currentStudioItems[i].q = parseFloat(qtyInp.value) || 0; };
 
             const prcInp = document.getElementById(`price-input-${i}`);
-            prcInp.oninput = () => { state.currentStudioItems[i].p = parseFloat(prcInp.value) || 0; syncStudioPreview(); };
+            prcInp.oninput = () => { state.currentStudioItems[i].p = parseFloat(prcInp.value) || 0; };
             prcInp.onkeydown = (e) => handlePriceKeydown(e, i);
         });
     }
 
-    function syncStudioPreview() {
+    function generateAndShowPreviewModal() {
         const clientName = document.getElementById('st-client').value || "";
         const dateVal = document.getElementById('st-date').value;
         const refVal = document.getElementById('st-ref-code').value;
@@ -1150,10 +1373,12 @@
         const labelPrefix = state.currentStudioMode === 'Invoice' ? 'Invoice No: ' : 'Quotation No: ';
         const computedArabicProfileName = autoGenerateArabicProfile(clientName);
 
+        document.getElementById('preview-modal-heading').innerText = `${state.currentStudioMode} Console Registry Verification [${refVal}]`;
         document.getElementById('p-client-name').innerText = "M/s: " + (clientName || "No Profile Selected");
         document.getElementById('p-client-name-ar').innerText = "السيد / " + (computedArabicProfileName ? computedArabicProfileName : "");
         document.getElementById('p-doc-date').innerText = "Date: " + dateVal;
         document.getElementById('p-doc-ref').innerText = labelPrefix + refVal;
+        document.getElementById('p-doc-title').innerText = state.currentStudioMode === 'Invoice' ? 'INVOICE / فاتورة' : 'QUOTATION / عرض سعر';
         
         let html = '', total = 0;
         state.currentStudioItems.forEach((item, i) => {
@@ -1168,6 +1393,14 @@
                 <td style="font-weight:bold; background:#f1f5f9; color: #000;">${total.toFixed(2)}</td>
             </tr>
         `;
+        
+        document.getElementById('document-preview-modal').style.display = 'flex';
+        setTimeout(resizePreviewCanvas, 50);
+    }
+
+    function closePreviewModal() {
+        document.getElementById('document-preview-modal').style.display = 'none';
+        switchView('documents');
     }
 
     function commitDocumentToMemory() {
@@ -1192,11 +1425,7 @@
 
         set(ref(db, 'documents/' + id), docPayload)
             .then(() => {
-                showNotification(
-                    "Document Saved", 
-                    `Successfully saved record to Firebase database. Ready for print.`,
-                    function() { window.print(); }
-                );
+                generateAndShowPreviewModal();
             });
     }
 
@@ -1210,16 +1439,13 @@
         
         switchView('studio');
         document.getElementById('studio-mode-title').innerText = `Review & Edit ${doc.type}`;
-        document.getElementById('p-doc-title').innerText = doc.type === 'Invoice' ? 'INVOICE / فاتورة' : 'QUOTATION / عرض سعر';
         document.getElementById('st-ref-code').value = doc.ref;
         document.getElementById('st-client').value = doc.client;
         document.getElementById('st-date').value = doc.date;
         
         renderStudioInputs();
-        syncStudioPreview();
     }
 
-    // Bind system architecture pipeline hooks directly to global window layer
     window.handleLogin = handleLogin;
     window.handleLogout = handleLogout;
     window.switchView = switchView;
@@ -1240,7 +1466,7 @@
     window.calculateAutoReference = calculateAutoReference;
     window.openStudio = openStudio;
     window.addStudioRow = addStudioRow;
-    window.syncStudioPreview = syncStudioPreview;
+    window.closePreviewModal = closePreviewModal;
     window.commitDocumentToMemory = commitDocumentToMemory;
     window.loadDocumentToStudio = loadDocumentToStudio;
 </script>
